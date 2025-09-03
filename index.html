@@ -22,6 +22,11 @@
                 <li class="nav-item"><a href="#projects" class="nav-link">Projects</a></li>
                 <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
+            <div class="theme-toggle">
+                <button id="theme-toggle-btn" class="theme-btn" aria-label="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
             <div class="hamburger">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -145,8 +150,14 @@
 <section id="projects" class="projects">
     <div class="container">
         <h2 class="section-title">Featured Projects</h2>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="python">Python</button>
+            <button class="filter-btn" data-filter="web">Web Development</button>
+            <button class="filter-btn" data-filter="ai">AI/ML</button>
+        </div>
         <div class="projects-grid">
-            <div class="project-card">
+            <div class="project-card" data-category="ai">
                 <div class="project-image">
                     <img src="https://via.placeholder.com/400x250/6366f1/ffffff?text=AI+Voice+Assistant" alt="AI Voice Assistant">
                 </div>
@@ -164,7 +175,7 @@
                 </div>
             </div>
 
-            <div class="project-card">
+            <div class="project-card" data-category="python">
                 <div class="project-image">
                     <img src="https://via.placeholder.com/400x250/8b5cf6/ffffff?text=BMI+Calculator" alt="BMI Calculator">
                 </div>
@@ -182,7 +193,7 @@
                 </div>
             </div>
 
-            <div class="project-card">
+            <div class="project-card" data-category="python">
                 <div class="project-image">
                     <img src="https://via.placeholder.com/400x250/10b981/ffffff?text=Weather+Forecast" alt="Weather Forecast">
                 </div>
@@ -258,6 +269,7 @@
         </div>
     </footer>
 
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>

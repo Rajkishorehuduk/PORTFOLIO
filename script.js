@@ -29,8 +29,14 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
+// Initialize EmailJS
+(function() {
+    emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your EmailJS public key
+})();
+
 // Form validation and submission
 const contactForm = document.querySelector('.contact-form');
+const submitBtn = contactForm.querySelector('button[type="submit"]');
 
 contactForm.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -42,20 +48,66 @@ contactForm.addEventListener('submit', function(e) {
 
     // Basic validation
     if (!name || !email || !subject || !message) {
-        alert('Please fill in all fields.');
+        showMessage('Please fill in all fields.', 'error');
         return;
     }
 
     if (!isValidEmail(email)) {
-        alert('Please enter a valid email address.');
+        showMessage('Please enter a valid email address.', 'error');
         return;
     }
 
-    // For now, just show a success message
-    // In a real application, you would send this data to a server
-    alert('Thank you for your message! I will get back to you soon.');
-    contactForm.reset();
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+
+    // Prepare template parameters
+    const templateParams = {
+        from_name: name,
+        from_email: email,
+        subject: subject,
+        message: message,
+        to_name: 'Rajkishore Huduk'
+    };
+
+    // Send email using EmailJS
+    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams) // Replace with your service and template IDs
+        .then(function(response) {
+            showMessage('Thank you for your message! I will get back to you soon.', 'success');
+            contactForm.reset();
+        }, function(error) {
+            showMessage('Failed to send message. Please try again later.', 'error');
+            console.error('EmailJS error:', error);
+        })
+        .finally(function() {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Message';
+        });
 });
+
+// Function to show messages
+function showMessage(message, type) {
+    // Remove existing message
+    const existingMessage = document.querySelector('.form-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+
+    // Create new message element
+    const messageEl = document.createElement('div');
+    messageEl.className = `form-message ${type}`;
+    messageEl.textContent = message;
+
+    // Insert after form
+    contactForm.appendChild(messageEl);
+
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (messageEl.parentNode) {
+            messageEl.remove();
+        }
+    }, 5000);
+}
 
 function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -104,4 +156,134 @@ document.querySelectorAll('.project-card').forEach(card => {
     card.addEventListener('mouseleave', () => {
         card.style.transform = 'translateY(0)';
     });
+});
+
+// Theme Management
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
+const themeIcon = themeToggleBtn.querySelector('i');
+
+// Check for saved theme preference or default to light mode
+const currentTheme = localStorage.getItem('theme') || 'light';
+
+// Apply the current theme
+document.documentElement.setAttribute('data-theme', currentTheme);
+updateThemeIcon(currentTheme);
+
+// Theme toggle function
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+// Update theme icon
+function updateThemeIcon(theme) {
+    if (theme === 'dark') {
+        themeIcon.className = 'fas fa-sun';
+    } else {
+        themeIcon.className = 'fas fa-moon';
+    }
+}
+
+// Event listener for theme toggle
+themeToggleBtn.addEventListener('click', toggleTheme);
+
+// Project Filtering
+const filterButtons = document.querySelectorAll('.filter-btn');
+const projectCards = document.querySelectorAll('.project-card');
+
+// Filter projects function
+function filterProjects(filterValue) {
+    projectCards.forEach(card => {
+        const category = card.getAttribute('data-category');
+
+        if (filterValue === 'all' || category === filterValue) {
+            card.style.display = 'block';
+            card.style.opacity = '1';
+            card.style.transform = 'scale(1)';
+        } else {
+            card.style.display = 'none';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.8)';
+        }
+    });
+}
+
+// Add event listeners to filter buttons
+filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        // Remove active class from all buttons
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+
+        // Add active class to clicked button
+        button.classList.add('active');
+
+        // Get filter value and apply filter
+        const filterValue = button.getAttribute('data-filter');
+        filterProjects(filterValue);
+    });
+});
+
+// Mobile-specific improvements
+document.addEventListener('DOMContentLoaded', function() {
+    // Improve mobile navigation
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    // Toggle mobile menu
+    hamburger.addEventListener('click', function() {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+    });
+
+    // Close mobile menu when clicking on a link
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        });
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!hamburger.contains(event.target) && !navMenu.contains(event.target)) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        }
+    });
+
+    // Prevent zoom on double tap for iOS
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+
+    // Improve touch interactions for filter buttons
+    filterButtons.forEach(button => {
+        button.addEventListener('touchstart', function() {
+            this.style.transform = 'scale(0.95)';
+        });
+
+        button.addEventListener('touchend', function() {
+            this.style.transform = '';
+        });
+    });
+
+    // Add viewport height fix for mobile browsers
+    function setVH() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+
+    setVH();
+    window.addEventListener('resize', setVH);
+    window.addEventListener('orientationchange', setVH);
 });

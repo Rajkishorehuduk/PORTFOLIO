@@ -1,3 +1,47 @@
+// Device Detection and Customization
+function detectDevice() {
+    const width = window.innerWidth;
+    if (width < 768) {
+        return 'mobile';
+    } else if (width < 1024) {
+        return 'tablet';
+    } else {
+        return 'desktop';
+    }
+}
+
+function applyDeviceClass() {
+    const device = detectDevice();
+    document.body.classList.add(`device-${device}`);
+}
+
+function customizeForDevice() {
+    const device = detectDevice();
+
+    if (device === 'mobile') {
+        // Customize for mobile: reduce animations, adjust scroll behavior
+        document.querySelectorAll('section').forEach(section => {
+            section.style.transition = 'opacity 0.3s ease, transform 0.3s ease'; // Faster transitions
+        });
+
+        // Disable hover effects on touch devices
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.style.transform = 'none'; // Remove hover transform
+        });
+
+        // Adjust navbar background for better mobile visibility
+        const navbar = document.querySelector('.navbar');
+        navbar.style.backdropFilter = 'blur(5px)';
+    } else if (device === 'tablet') {
+        // Tablet specific customizations
+        // Perhaps adjust grid layouts or font sizes
+    } else {
+        // Desktop: full features
+    }
+}
+
+// Device class and customization applied in the main DOMContentLoaded below
+
 // Hamburger menu toggle
 const hamburger = document.querySelector('.hamburger');
 const navMenu = document.querySelector('.nav-menu');
@@ -227,8 +271,12 @@ filterButtons.forEach(button => {
     });
 });
 
-// Mobile-specific improvements
+// Mobile-specific improvements and device customization
 document.addEventListener('DOMContentLoaded', function() {
+    // Apply device class and customization
+    applyDeviceClass();
+    customizeForDevice();
+
     // Improve mobile navigation
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
@@ -286,4 +334,12 @@ document.addEventListener('DOMContentLoaded', function() {
     setVH();
     window.addEventListener('resize', setVH);
     window.addEventListener('orientationchange', setVH);
+
+    // Handle resize for device changes
+    window.addEventListener('resize', function() {
+        // Remove old classes
+        document.body.classList.remove('device-mobile', 'device-tablet', 'device-desktop');
+        applyDeviceClass();
+        customizeForDevice();
+    });
 });

@@ -823,6 +823,12 @@ section {
     }
 }
 
+/* Counter Button Enhancements */
+.animate-click {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+}
+
 /* Touch-friendly improvements */
 @media (hover: none) and (pointer: coarse) {
     .filter-btn {
